@@ -86,9 +86,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # =========================
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgresql://postgres:OKLAHOMA@localhost:5432/incidencias',
+        default=os.environ.get("DATABASE_URL"),
         conn_max_age=600,
-        ssl_require=False
+        ssl_require=True
     )
 }
 
