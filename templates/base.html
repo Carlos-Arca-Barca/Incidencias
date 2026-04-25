@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <meta charset="UTF-8">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <title>{% block title %}Aplicación{% endblock %}</title>
+</head>
+
+<body>
+
+<header>
+    <h1>Gestión de Incidencias</h1>
+
+    <div class="user-info">
+        {% if user.is_authenticated %}
+            <span>{{ user.username }}</span>
+
+            <form action="/accounts/logout/" method="post">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+            </form>
+        {% endif %}
+    </div>
+</header>
+
+{% if user.is_authenticated %}
+<nav>
+    <a href="/">Inicio</a>
+    <a href="#">Incidencias</a>
+    <a href="#">Clientes</a>
+    <a href="#">Configuración</a>
+</nav>
+{% endif %}
+
+<main class="main-content">
+    {% block content %}
+    {% endblock %}
+</main>
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1 class="page-title">Calidad</h1>
+</div>
+
+<form class="filtros">
+
+    <div class="filtro">
+        <label>Código</label>
+        <input type="text" name="codigo" onkeyup="autoFilter()">
+    </div>
+
+    <div class="filtro">
+        <label>Descripción</label>
+        <input type="text" name="descripcion" onkeyup="autoFilter()">
+    </div>
+
+    <div class="filtro">
+        <label>Notas</label>
+        <input type="text" name="notas" onkeyup="autoFilter()">
+    </div>
+
+    <div class="botones">
+        <button type="button" onclick="refreshGrid()">Filtrar</button>
+        <button type="button" onclick="limpiar()">Limpiar</button>
+    </div>
+
+</form>
+
+<hr>
+
+<div id="grid-container"></div>
+
+<hr>
+
+<button id="btn_ver" disabled onclick="accion('ver')">Ver</button>
+<button id="btn_editar" disabled onclick="accion('editar')">Editar</button>
+<button id="btn_eliminar" disabled onclick="accion('eliminar')">Eliminar</button>
+
+<script>
+
+const URL_GRID = "{% url 'calidad_grid' %}";
+
+let currentOrder = "codigo";
+let currentDir = "asc";
+let currentPage = 1;
+let timer = null;
+
+function buildParams() {
+    const form = document.querySelector(".filtros");
+    const params = new URLSearchParams(new FormData(form));
+
+    params.set("orden", currentOrder);
+    params.set("dir", currentDir);
+    params.set("page", currentPage);
+
+    return params.toString();
+}
+
+function refreshGrid() {
+
+    resetSelection(); // ← SIEMPRE aquí
+
+    const form = document.querySelector(".filtros");
+    const params = new URLSearchParams(new FormData(form));
+
+    params.set("orden", currentOrder);
+    params.set("dir", currentDir);
+    params.set("page", currentPage);
+
+    htmx.ajax("GET", URL_GRID + "?" + params.toString(), {
+        target: "#grid-container",
+        swap: "innerHTML"
+    });
+}
+
+
+function resetSelection() {
+
+    document.querySelectorAll(".row")
+        .forEach(r => r.classList.remove("selected"));
+
+    syncSelectionState();
+}
+
+
+function autoFilter() {
+    currentPage = 1;
+    clearTimeout(timer);
+    timer = setTimeout(refreshGrid, 400);
+}
+
+function limpiar() {
+
+    document.querySelectorAll(".filtros input").forEach(i => i.value = "");
+
+    currentPage = 1;
+    currentOrder = "codigo";
+    currentDir = "asc";
+
+    resetSelection();   // ← importante aquí también
+
+    refreshGrid();
+}
+
+function goPage(p) {
+    currentPage = p;
+    refreshGrid();
+}
+
+function sortBy(field) {
+
+    if (currentOrder === field) {
+        currentDir = currentDir === "asc" ? "desc" : "asc";
+    } else {
+        currentOrder = field;
+        currentDir = "asc";
+    }
+
+    currentPage = 1;
+    refreshGrid();
+}
+
+function selectRow(row) {
+
+    document.querySelectorAll(".row")
+        .forEach(r => r.classList.remove("selected"));
+
+    row.classList.add("selected");
+
+    syncSelectionState();
+}
+
+function getSelectedId() {
+    const row = document.querySelector(".row.selected");
+    return row ? row.dataset.id : null;
+}
+
+function accion(tipo) {
+    const id = getSelectedId();
+
+    if (!id) {
+        alert("Selecciona un registro");
+        return;
+    }
+
+    alert(tipo + " ID: " + id);
+}
+
+function syncSelectionState() {
+    const hasSelection = document.querySelector(".row.selected") !== null;
+
+    ["btn_ver","btn_editar","btn_eliminar"].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.disabled = !hasSelection;
+    });
+}
+
+document.addEventListener("DOMContentLoaded", refreshGrid);
+document.addEventListener("htmx:afterSwap", function () {
+    resetSelection();
+});
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,301 @@
+/* =========================
+   RESET
+========================= */
+body {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    margin: 0;
+    background-color: #f4f6f9;
+}
+
+/* =========================
+   HEADER
+========================= */
+header {
+    background-color: #003366;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1;
+}
+
+/* =========================
+   TITULOS
+========================= */
+.page-header {
+    margin-bottom: 10px;
+}
+
+.page-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 5px 0 10px 0;
+}
+
+button {
+    font-size: 13px;
+    padding: 4px 8px;
+}
+
+/* =========================
+   USUARIO
+========================= */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.user-info span,
+.user-info form,
+.user-info button {
+    display: inline-flex;
+    align-items: center;
+}
+
+.user-info button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+/* =========================
+   NAV
+========================= */
+nav {
+    background-color: #e6e6e6;
+    padding: 10px 20px;
+}
+
+nav a {
+    margin-right: 15px;
+    text-decoration: none;
+    color: #003366;
+    font-weight: bold;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   CONTENIDO
+========================= */
+.main-content {
+    padding: 10px 20px;
+}
+
+/* =========================
+   LOGIN
+========================= */
+.login-box {
+    width: 300px;
+    margin: 100px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.login-box input,
+.login-box button {
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    box-sizing: border-box;
+}
+
+.login-box button {
+    background-color: #003366;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.login-box button:hover {
+    background-color: #0055aa;
+}
+
+/* =========================
+   FILTROS
+========================= */
+:root {
+    --filter-label-width: 80px;
+    --filter-input-width: 200px;
+    --filter-gap: 10px;
+    --filter-block-gap: 18px;
+}
+
+.filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--filter-block-gap);
+    align-items: flex-start;
+}
+
+.filtro {
+    display: flex;
+    align-items: center;
+    gap: var(--filter-gap);
+}
+
+.filtro label {
+    width: var(--filter-label-width);
+    text-align: right;
+}
+
+.filtro input,
+.filtro select {
+    width: var(--filter-input-width);
+    padding: 4px;
+    box-sizing: border-box;
+    font-size: 14px
+}
+
+.botones {
+    flex-basis: 100%;
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* =========================
+   GRID CONTENEDOR
+========================= */
+.grid-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-scroll {
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background: white;
+}
+
+/* =========================
+   TABLA GRID (CLAVE)
+========================= */
+.table-grid {
+    width: 100%;
+    table-layout: fixed;   /* 🔥 evita cambios de ancho */
+    border-collapse: collapse;
+}
+
+/* CABECERAS */
+.table-grid th {
+    text-align: left;
+    padding: 6px 8px;
+    font-size: 13px;
+    line-height: 0.6;
+    padding-right: 26px; /* espacio fijo para flecha */
+    cursor: pointer;
+    background: #f8f8f8;
+    user-select: none;
+
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.table-grid th.sorted {
+    background-color: #e8f1ff;
+    color: #003366;
+    font-weight: bold;
+}
+
+/* CELDAS */
+.table-grid td {
+    
+    line-height: 0.6;
+    padding: 6px 8px;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* FILAS */
+.table-grid tr.selected {
+    background-color: #cfe8ff;
+}
+
+.table-grid tr:hover:not(.selected) {
+    background: #f0f8ff;
+}
+
+/* =========================
+   ICONO ORDEN (SIN AFECTAR ANCHO)
+========================= */
+.sort-icon {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #003366;
+    pointer-events: none;
+}
+
+/* ASC */
+th.sorted.asc .sort-icon::before {
+    content: "▲";
+}
+
+/* DESC */
+th.sorted.desc .sort-icon::before {
+    content: "▼";
+}
+
+/* =========================
+   PAGINACION
+========================= */
+.paginacion {
+    margin-top: 12px;
+    padding-top: 6px;
+    border-top: 1px solid #ddd;
+
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.paginacion button {
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    background: white;
+    color: #003366;
+    cursor: pointer;
+}
+
+.paginacion button:hover:not(:disabled) {
+    background: #f0f8ff;
+}
+
+.paginacion button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.paginacion button.active {
+    background: #003366;
+    color: white;
+    font-weight: bold;
+}
