@@ -84,13 +84,29 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # =========================
 # DATABASE
 # =========================
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True
-    )
-}
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    # PRODUCCIÓN (Render / Neon)
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+else:
+    # LOCAL
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'incidencias',
+            'USER': 'postgres',
+            'PASSWORD': 'OKLAHOMA',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 
 # =========================
