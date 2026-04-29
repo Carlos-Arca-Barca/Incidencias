@@ -3,6 +3,7 @@
 <head>
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <meta charset="UTF-8">
+
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
@@ -15,18 +16,15 @@
     <h1>Gestión de Incidencias</h1>
 
     <div class="user-info">
-        {% if user.is_authenticated %}
-            <span>{{ user.username }}</span>
+    <span>{{ user.username }}</span>
 
-            <form action="/accounts/logout/" method="post">
-                {% csrf_token %}
-                <button type="submit">Logout</button>
-            </form>
-        {% endif %}
-    </div>
+    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+</div>
 </header>
 
-{% if user.is_authenticated %}
 <nav>
     <a href="{% url 'home' %}">Inicio</a>
     <a href="{% url 'calidad' %}">Calidad</a>
@@ -34,19 +32,7 @@
     {% if user.is_staff %}
         <a href="{% url 'admin:index' %}">Admin</a>
     {% endif %}
-
-    <form action="/accounts/logout/" method="post" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-    </form>
 </nav>
-{% endif %}
-
-
-<p style="color:red; font-weight:bold;">
-    <p>USER: {{ user }}</p>
-</p>
-
 
 <main class="main-content">
     {% block content %}

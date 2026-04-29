@@ -192,15 +192,16 @@ nav a:hover {
 .grid-wrapper {
     display: flex;
     flex-direction: column;
+    height: 400px;
 }
 
-
 .grid-scroll {
-    max-height: calc(100vh - 320px);
+    flex: 1;
     overflow-y: auto;
     border: 1px solid #ccc;
     background: white;
 }
+
 /* =========================
    TABLA GRID
 ========================= */
