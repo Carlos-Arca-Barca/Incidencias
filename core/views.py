@@ -1,7 +1,11 @@
-from django.shortcuts import render
 from .models import Calidad
 from django.core.paginator import Paginator
 from .utils.grid import build_grid
+from django.shortcuts import render, get_object_or_404, redirect
+from .forms import CalidadForm
+
+
+
 
 
 def home(request):
@@ -28,9 +32,7 @@ def calidad(request):
     return render(request, "core/calidad.html", context)
 
 
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Calidad
-from .forms import CalidadForm
+
 
 
 def calidad_nuevo(request):
