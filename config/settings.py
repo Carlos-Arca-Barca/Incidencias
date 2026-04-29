@@ -21,7 +21,7 @@ SECRET_KEY = os.environ.get(
     "django-insecure-local-temporal-key"
 )
 
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+DEBUG = True
 
 ALLOWED_HOSTS = os.environ.get(
     "ALLOWED_HOSTS",
