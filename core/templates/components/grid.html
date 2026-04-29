@@ -1,0 +1,98 @@
+{% load custom_tags %}
+
+<div class="grid-wrapper">
+
+    <div class="grid-scroll">
+
+        <table class="table-grid">
+
+            <thead>
+                <tr>
+                    {% for col in columnas %}
+                        <th
+                            {% if col.width %}style="width: {{ col.width }}; min-width: {{ col.width }};"{% endif %}
+
+                            {% if col.sortable %}
+                                onclick="sortBy('{{ col.field }}', '{{ orden }}', '{{ dir }}')"
+                                class="{% if orden == col.field %}sorted {{ dir }}{% endif %}"
+                            {% endif %}
+                        >
+                            {{ col.label }}
+                            {% if col.sortable %}
+                                <span class="sort-icon"></span>
+                            {% endif %}
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for row in page_obj %}
+                <tr class="row" data-id="{{ row.id }}" onclick="selectRow(this)">
+                    {% for col in columnas %}
+                        <td {% if col.width %}style="width: {{ col.width }};"{% endif %}>
+                            {{ row|get_field:col.field }}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div class="grid-footer">
+
+        <div class="grid-footer-left">
+            <button type="button" onclick="refreshGrid()">Actualizar</button>
+        </div>
+
+        <div class="paginacion grid-footer-center">
+
+            <!-- Inicio -->
+            <button onclick="goPage(1)" {% if page_obj.number == 1 %}disabled{% endif %}>⏮</button>
+
+            <!-- Anterior -->
+            <button onclick="goPage({{ page_obj.number|add:'-1' }})"
+                {% if not page_obj.has_previous %}disabled{% endif %}>◀</button>
+
+            <!-- PÁGINAS PRO -->
+            {% for num in pages %}
+
+                {% if num == "..." %}
+                    <span class="puntos">…</span>
+
+                {% elif num == "" %}
+                    <span class="puntos placeholder">…</span>
+
+                {% else %}
+                    <button onclick="goPage({{ num }})"
+                        {% if num == page_obj.number %}class="active"{% endif %}>
+                        {{ num }}
+                    </button>
+                {% endif %}
+
+            {% endfor %}
+
+            <!-- Siguiente -->
+            <button onclick="goPage({{ page_obj.number|add:'1' }})"
+                {% if not page_obj.has_next %}disabled{% endif %}>▶</button>
+
+            <!-- Final -->
+            <button onclick="goPage({{ page_obj.paginator.num_pages }})"
+                {% if page_obj.number == page_obj.paginator.num_pages %}disabled{% endif %}>⏭</button>
+
+        </div>
+
+        <div class="grid-footer-right">
+            <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            <span>
+                Registros filtrados {{ page_obj.paginator.count }} 
+                de {{ total_registros|default:page_obj.paginator.count }}
+            </span>
+        </div>
+
+    </div>
+
+</div>

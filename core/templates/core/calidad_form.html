@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1 class="page-title">
+        {% if modo == "nuevo" %}Nuevo{% endif %}
+        {% if modo == "editar" %}Editar{% endif %}
+        {% if modo == "ver" %}Ver{% endif %}
+        Calidad
+    </h1>
+</div>
+
+<form method="post" class="form-card">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <div class="form-actions">
+
+        <a href="{% url 'calidad' %}">Volver</a>
+
+        {% if modo != "ver" %}
+            <button type="submit">Guardar</button>
+        {% endif %}
+
+    </div>
+
+</form>
+
+{% endblock %}

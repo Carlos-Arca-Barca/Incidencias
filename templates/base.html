@@ -28,10 +28,12 @@
 
 {% if user.is_authenticated %}
 <nav>
-    <a href="/">Inicio</a>
-    <a href="#">Incidencias</a>
-    <a href="#">Clientes</a>
-    <a href="#">Configuración</a>
+    <a href="{% url 'home' %}">Inicio</a>
+    <a href="{% url 'calidad' %}">Calidad</a>
+
+    {% if user.is_staff %}
+        <a href="{% url 'admin:index' %}">Admin</a>
+    {% endif %}
 </nav>
 {% endif %}
 

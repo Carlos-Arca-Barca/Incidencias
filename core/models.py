@@ -17,6 +17,12 @@ class Calidad(models.Model):
         verbose_name="Notas",
     )
 
+    GRID_COLUMNS = [
+        {"field": "codigo", "label": "Código"},
+        {"field": "descripcion", "label": "Descripción"},
+        {"field": "notas", "label": "Notas"},
+    ]
+
     def __str__(self):
         return f"{self.codigo} - {self.descripcion}"
 

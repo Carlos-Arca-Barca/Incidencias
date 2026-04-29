@@ -39,9 +39,21 @@ header h1 {
     margin: 5px 0 10px 0;
 }
 
-button {
+/* =========================
+   BOTONES
+========================= */
+.filtros button,
+.grid-actions button,
+.paginacion button {
     font-size: 13px;
     padding: 4px 8px;
+}
+
+.grid-actions-bottom {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 /* =========================
@@ -126,7 +138,7 @@ nav a:hover {
 }
 
 /* =========================
-   FILTROS
+   FILTROS (CORREGIDO FINAL)
 ========================= */
 :root {
     --filter-label-width: 80px;
@@ -148,9 +160,11 @@ nav a:hover {
     gap: var(--filter-gap);
 }
 
+/* 🔥 CLAVE: alineación vertical de todas las filas */
 .filtro label {
     width: var(--filter-label-width);
-    text-align: right;
+    text-align: left;
+    flex-shrink: 0;
 }
 
 .filtro input,
@@ -158,14 +172,18 @@ nav a:hover {
     width: var(--filter-input-width);
     padding: 4px;
     box-sizing: border-box;
-    font-size: 14px
+    font-size: 14px;
 }
 
-.botones {
-    flex-basis: 100%;
+/* =========================
+   GRID ACTIONS
+========================= */
+.grid-actions {
     display: flex;
-    gap: 10px;
-    margin-top: 10px;
+    align-items: center;
+    gap: 16px;
+    margin: 10px 0 12px 0;
+    flex-wrap: wrap;
 }
 
 /* =========================
@@ -176,29 +194,28 @@ nav a:hover {
     flex-direction: column;
 }
 
+
 .grid-scroll {
-    height: 400px;
+    max-height: calc(100vh - 320px);
     overflow-y: auto;
     border: 1px solid #ccc;
     background: white;
 }
-
 /* =========================
-   TABLA GRID (CLAVE)
+   TABLA GRID
 ========================= */
 .table-grid {
     width: 100%;
-    table-layout: fixed;   /* 🔥 evita cambios de ancho */
+    table-layout: fixed;
     border-collapse: collapse;
 }
 
-/* CABECERAS */
 .table-grid th {
     text-align: left;
     padding: 6px 8px;
     font-size: 13px;
-    line-height: 0.6;
-    padding-right: 26px; /* espacio fijo para flecha */
+    line-height: 1.2;
+    padding-right: 26px;
     cursor: pointer;
     background: #f8f8f8;
     user-select: none;
@@ -218,18 +235,15 @@ nav a:hover {
     font-weight: bold;
 }
 
-/* CELDAS */
 .table-grid td {
-    
-    line-height: 0.6;
     padding: 6px 8px;
+    line-height: 1.2;
 
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-/* FILAS */
 .table-grid tr.selected {
     background-color: #cfe8ff;
 }
@@ -238,8 +252,13 @@ nav a:hover {
     background: #f0f8ff;
 }
 
+.table-grid th,
+.table-grid td {
+    box-sizing: border-box;
+}
+
 /* =========================
-   ICONO ORDEN (SIN AFECTAR ANCHO)
+   ICONO ORDEN
 ========================= */
 .sort-icon {
     position: absolute;
@@ -254,31 +273,51 @@ nav a:hover {
     pointer-events: none;
 }
 
-/* ASC */
 th.sorted.asc .sort-icon::before {
     content: "▲";
 }
 
-/* DESC */
 th.sorted.desc .sort-icon::before {
     content: "▼";
 }
 
 /* =========================
-   PAGINACION
+   GRID FOOTER
 ========================= */
-.paginacion {
-    margin-top: 12px;
+.grid-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
     padding-top: 6px;
     border-top: 1px solid #ddd;
 
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    white-space: nowrap;
+}
+
+/* =========================
+   PAGINACIÓN
+========================= */
+.paginacion {
     display: flex;
     gap: 5px;
-    flex-wrap: wrap;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.paginacion button,
+.paginacion .puntos {
+    min-width: 34px;
+    height: 28px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .paginacion button {
-    padding: 4px 8px;
     border: 1px solid #ccc;
     background: white;
     color: #003366;
@@ -298,4 +337,46 @@ th.sorted.desc .sort-icon::before {
     background: #003366;
     color: white;
     font-weight: bold;
+}
+
+.paginacion .puntos {
+    color: #666;
+    user-select: none;
+}
+
+/* =========================
+   CONTADORES
+========================= */
+.contador-registros {
+    margin-left: 10px;
+}
+
+.contador-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: #e8f1ff;
+    border: 1px solid #c7dbff;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #003366;
+}
+
+.contador-badge .current,
+.contador-badge .total {
+    font-weight: 600;
+}
+
+/* =========================
+   BOTÓN ACTUALIZAR
+========================= */
+.grid-actions button.actualizar {
+    background-color: #e8f1ff;
+    border: 1px solid #003366;
+    color: #003366;
+}
+
+.grid-actions button.actualizar:hover {
+    background-color: #d6e6ff;
 }

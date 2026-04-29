@@ -3,6 +3,9 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path("calidad/", views.calidad_list, name="calidad_list"),
-    path("calidad/grid/", views.calidad_grid, name="calidad_grid"),
+    path("calidad/", views.calidad, name="calidad"),
+    path("calidad/nuevo/", views.calidad_nuevo, name="calidad_nuevo"),
+    path("calidad/<int:id>/", views.calidad_ver, name="calidad_ver"),
+    path("calidad/<int:id>/editar/", views.calidad_editar, name="calidad_editar"),
+    path("calidad/<int:id>/eliminar/", views.calidad_eliminar, name="calidad_eliminar"),
 ]

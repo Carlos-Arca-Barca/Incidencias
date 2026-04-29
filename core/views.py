@@ -1,48 +1,97 @@
-
 from django.shortcuts import render
 from .models import Calidad
 from django.core.paginator import Paginator
+from .utils.grid import build_grid
 
 
 def home(request):
     return render(request, "core/home.html")
 
 
-def calidad_list(request):
-    return render(request, "core/calidad_list.html")
-
-
-def calidad_grid(request):
-
-    codigo = request.GET.get("codigo", "")
-    descripcion = request.GET.get("descripcion", "")
-    notas = request.GET.get("notas", "")
-
-    orden = request.GET.get("orden", "codigo")
-    dir_ = request.GET.get("dir", "asc")
-    page = request.GET.get("page", 1)
+def calidad(request):
 
     qs = Calidad.objects.all()
 
-    if codigo:
-        qs = qs.filter(codigo__icontains=codigo)
+    columnas = [
+        {"field": "codigo", "label": "Código", "sortable": True, "width": "120px"},
+        {"field": "descripcion", "label": "Descripción", "sortable": True, "width": "250px"},
+        {"field": "notas", "label": "Notas", "sortable": False, "width": "auto"},
+    ]
+    
+    context = build_grid(
+        request=request,
+        qs=qs,
+        columnas=columnas,
+        page_size=10
+    )
 
-    if descripcion:
-        qs = qs.filter(descripcion__icontains=descripcion)
+    return render(request, "core/calidad.html", context)
 
-    if notas:
-        qs = qs.filter(notas__icontains=notas)
 
-    if dir_ == "desc":
-        orden = "-" + orden
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Calidad
+from .forms import CalidadForm
 
-    qs = qs.order_by(orden)
 
-    paginator = Paginator(qs, 10)
-    page_obj = paginator.get_page(page)
+def calidad_nuevo(request):
 
-    return render(request, "core/calidad_grid.html", {
-        "calidades": page_obj,
-        "orden": request.GET.get("orden", "codigo"),
-        "dir": dir_,
+    if request.method == "POST":
+        form = CalidadForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("calidad")
+    else:
+        form = CalidadForm()
+
+    return render(request, "core/calidad_form.html", {
+        "form": form,
+        "modo": "nuevo"
+    })
+
+
+def calidad_ver(request, id):
+
+    obj = get_object_or_404(Calidad, id=id)
+    form = CalidadForm(instance=obj)
+
+    # desactivar campos
+    for field in form.fields.values():
+        field.disabled = True
+
+    return render(request, "core/calidad_form.html", {
+        "form": form,
+        "modo": "ver",
+        "id": id
+    })
+
+
+def calidad_editar(request, id):
+
+    obj = get_object_or_404(Calidad, id=id)
+
+    if request.method == "POST":
+        form = CalidadForm(request.POST, instance=obj)
+        if form.is_valid():
+            form.save()
+            return redirect("calidad")
+    else:
+        form = CalidadForm(instance=obj)
+
+    return render(request, "core/calidad_form.html", {
+        "form": form,
+        "modo": "editar",
+        "id": id
+    })
+
+
+def calidad_eliminar(request, id):
+
+    obj = get_object_or_404(Calidad, id=id)
+
+    if request.method == "POST":
+        obj.delete()
+        return redirect("calidad")
+
+    return render(request, "core/calidad_confirm_delete.html", {
+        "obj": obj
     })
