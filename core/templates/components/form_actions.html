@@ -1,0 +1,15 @@
+<div class="form-actions" style="display:flex; justify-content:flex-end; gap:10px;">
+
+    {% if modo != "ver" %}
+        <button type="submit" class="btn-primary">
+            Guardar
+        </button>
+    {% endif %}
+
+    <button type="button"
+            onclick="window.location.href='{{ cancel_url }}'"
+            class="btn-secondary">
+        Cancelar
+    </button>
+
+</div>

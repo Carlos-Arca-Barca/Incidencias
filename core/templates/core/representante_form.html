@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1 class="page-title">
+        {% if modo == "nuevo" %}Nuevo{% endif %}
+        {% if modo == "editar" %}Editar{% endif %}
+        {% if modo == "ver" %}Ver{% endif %}
+        Representante
+    </h1>
+</div>
+
+<form method="post"
+      class="form-card"
+      id="representante-form"
+      data-lookup-storage="representante_form_state"
+      data-cancel-url="{% url 'representantes' %}{% if next %}?{{ next }}{% endif %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+
+    <div class="form-col">
+        {% for field in form %}
+        <div class="form-row">
+
+            <label for="{{ field.id_for_label }}">
+                {{ field.label }}
+            </label>
+
+            <div class="form-field">
+
+                {% if field.name == "comercial" %}
+
+                    <div style="display:flex; gap:8px; align-items:center;">
+
+                        <div style="flex:1;">
+                            {{ field }}
+                        </div>
+
+                        {% if modo != "ver" %}
+                            <button
+                                type="button"
+                                class="btn-secondary"
+                                data-lookup-url="{% url 'comerciales' %}"
+                                data-lookup-target="id_comercial"
+                                onclick="Lookup.open(this)"
+                            >
+                                🔍
+                            </button>
+                        {% endif %}
+
+                    </div>
+
+                {% else %}
+
+                    {{ field }}
+
+                {% endif %}
+
+                {% if field.errors %}
+                    <div class="form-error">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <div class="form-actions" style="display:flex; justify-content:flex-end; gap:10px;">
+
+        {% if modo != "ver" %}
+            <button type="submit" class="btn-primary">
+                Guardar
+            </button>
+        {% endif %}
+
+        <button type="button"
+                class="btn-secondary"
+                onclick="Lookup.cancel(this)">
+            Cancelar
+        </button>
+
+    </div>
+</form>
+
+{% endblock %}

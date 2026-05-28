@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1 class="page-title">Representantes</h1>
+</div>
+
+<form class="filtros" onsubmit="return false;">
+    {% for filtro in grid_filters %}
+        <div class="filtro">
+            <label>{{ filtro.label }}</label>
+
+            {% if filtro.type == "textarea" %}
+                <textarea name="{{ filtro.field }}" onkeyup="autoFilter()">{{ filtro.value|default:'' }}</textarea>
+
+            {% elif filtro.type == "select" %}
+                <select name="{{ filtro.field }}" onchange="autoFilter()">
+                    {% for opcion in filtro.options %}
+                        <option value="{{ opcion.value }}" {% if opcion.value == filtro.value %}selected{% endif %}>
+                            {{ opcion.label }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+            {% else %}
+                <input
+                    type="{{ filtro.type|default:'text' }}"
+                    name="{{ filtro.field }}"
+                    value="{{ filtro.value|default:'' }}"
+                    onkeyup="autoFilter()"
+                >
+            {% endif %}
+        </div>
+    {% endfor %}
+</form>
+
+<div class="grid-actions">
+    <button type="button" onclick="refreshGrid()">Filtrar</button>
+    <button type="button" onclick="limpiar()">Limpiar</button>
+</div>
+
+<hr>
+
+<div id="grid-container">
+    {% include "components/grid.html" %}
+</div>
+
+<script>
+const GRID_URLS = {
+    ver: "{{ grid_urls.ver }}",
+    editar: "{{ grid_urls.editar }}",
+    eliminar: "{{ grid_urls.eliminar }}",
+    nuevo: "{{ grid_urls.nuevo }}"
+};
+</script>
+
+<script src="{% static 'js/grid.js' %}"></script>
+
+<script>
+initGrid({
+    urls: GRID_URLS,
+    buttons: [
+        { id: "btn_ver", requiresSelection: true },
+        { id: "btn_editar", requiresSelection: true },
+        { id: "btn_eliminar", requiresSelection: true },
+        { id: "btn_nuevo", requiresSelection: false }
+    ]
+});
+</script>
+
+{% endblock %}

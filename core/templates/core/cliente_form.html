@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1 class="page-title">
+        {% if modo == "nuevo" %}Nuevo{% endif %}
+        {% if modo == "editar" %}Editar{% endif %}
+        {% if modo == "ver" %}Ver{% endif %}
+        Cliente
+    </h1>
+</div>
+
+<form method="post"
+      class="form-card"
+      id="cliente-form"
+      data-lookup-storage="cliente_form_state"
+      data-cancel-url="{% url 'clientes' %}{% if next %}?{{ next }}{% endif %}">
+
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+
+    <div class="form-col">
+
+        {% for field in form %}
+        <div class="form-row">
+
+            <label for="{{ field.id_for_label }}">
+                {{ field.label }}
+            </label>
+
+            <div class="form-field">
+
+                {% if field.name == "representante" %}
+
+                    <div style="display:flex; gap:8px; align-items:center;">
+
+                        <div style="flex:1;">
+                            {{ field }}
+                        </div>
+
+                        {% if modo != "ver" %}
+                        <button type="button"
+                                class="btn-secondary"
+                                data-lookup-url="{% url 'representantes' %}"
+                                data-lookup-target="id_representante"
+                                onclick="Lookup.open(this)">
+                            🔍
+                        </button>
+                        {% endif %}
+
+                    </div>
+
+                {% elif field.name == "comercial_display" %}
+
+                    <input type="text"
+                           id="id_comercial_display"
+                           class="form-control"
+                           readonly
+                           style="background:#f2f2f2;">
+
+                {% else %}
+
+                    {{ field }}
+
+                {% endif %}
+
+                {% if field.errors %}
+                    <div class="form-error">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <div class="form-actions" style="display:flex; justify-content:flex-end; gap:10px;">
+
+        {% if modo != "ver" %}
+        <button type="submit" class="btn-primary">
+            Guardar
+        </button>
+        {% endif %}
+
+        <button type="button"
+                class="btn-secondary"
+                onclick="Lookup.cancel(this)">
+            Cancelar
+        </button>
+
+    </div>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const repField = document.getElementById("id_representante");
+    const comercialField = document.getElementById("id_comercial_display");
+
+    if (!repField || !comercialField) return;
+
+    async function loadComercial(representanteId) {
+
+        if (!representanteId) {
+            comercialField.value = "";
+            return;
+        }
+
+        try {
+            const response = await fetch(`/ajax/representante/${representanteId}/comercial/`);
+            const data = await response.json();
+
+            comercialField.value = data.descripcion || "";
+
+        } catch (error) {
+            console.error("Error AJAX comercial:", error);
+            comercialField.value = "";
+        }
+    }
+
+    // cambio normal del select
+    repField.addEventListener("change", function () {
+        loadComercial(this.value);
+    });
+
+    // carga inicial
+    if (repField.value) {
+        loadComercial(repField.value);
+    }
+
+    // 🔥 CLAVE: engancharse a la lupa (NO la modificamos)
+    document.addEventListener("lookup:select", function (e) {
+
+        const target = e.detail?.target;
+
+        if (target === "id_representante") {
+            repField.dispatchEvent(new Event("change"));
+        }
+    });
+
+});
+</script>
+
+{% endblock %}

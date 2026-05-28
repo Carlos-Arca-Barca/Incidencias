@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1 class="page-title">Eliminar Categoría</h1>
+</div>
+
+<div class="form-card">
+
+    <p>¿Seguro que deseas eliminar este registro?</p>
+
+    <p><strong>Código:</strong> {{ obj.codigo }}</p>
+    <p><strong>Descripción:</strong> {{ obj.descripcion }}</p>
+    <p><strong>Notas:</strong> {{ obj.notas }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+
+        <div class="form-actions"
+             style="display:flex; justify-content:flex-end; gap:10px;">
+
+            <button type="submit"
+                    class="btn-danger">
+                Eliminar
+            </button>
+
+            <button type="button"
+                    onclick="window.location.href='{% url 'categorias' %}{% if next %}?{{ next }}{% endif %}'"
+                    class="btn-secondary">
+                Cancelar
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

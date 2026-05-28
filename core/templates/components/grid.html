@@ -11,9 +11,8 @@
                     {% for col in columnas %}
                         <th
                             {% if col.width %}style="width: {{ col.width }}; min-width: {{ col.width }};"{% endif %}
-
                             {% if col.sortable %}
-                                onclick="sortBy('{{ col.field }}', '{{ orden }}', '{{ dir }}')"
+                                onclick="sortBy('{{ col.field }}')"
                                 class="{% if orden == col.field %}sorted {{ dir }}{% endif %}"
                             {% endif %}
                         >
@@ -31,9 +30,23 @@
                 <tr class="row" data-id="{{ row.id }}" onclick="selectRow(this)">
                     {% for col in columnas %}
                         <td {% if col.width %}style="width: {{ col.width }};"{% endif %}>
-                            {{ row|get_field:col.field }}
+
+                            {% with value=row|get_field:col.field %}
+
+                                {% if "fecha" in col.field and value %}
+                                    {{ value|date:"d-m-Y" }}
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+
+                            {% endwith %}
+
                         </td>
                     {% endfor %}
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="{{ columnas|length }}">No hay registros.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -50,37 +63,28 @@
 
         <div class="paginacion grid-footer-center">
 
-            <!-- Inicio -->
-            <button onclick="goPage(1)" {% if page_obj.number == 1 %}disabled{% endif %}>⏮</button>
+            <button type="button" onclick="goPage(1)" {% if page_obj.number == 1 %}disabled{% endif %}>⏮</button>
 
-            <!-- Anterior -->
-            <button onclick="goPage({{ page_obj.number|add:'-1' }})"
+            <button type="button" onclick="goPage({{ page_obj.number|add:'-1' }})"
                 {% if not page_obj.has_previous %}disabled{% endif %}>◀</button>
 
-            <!-- PÁGINAS PRO -->
             {% for num in pages %}
-
                 {% if num == "..." %}
                     <span class="puntos">…</span>
-
                 {% elif num == "" %}
                     <span class="puntos placeholder">…</span>
-
                 {% else %}
-                    <button onclick="goPage({{ num }})"
+                    <button type="button" onclick="goPage({{ num }})"
                         {% if num == page_obj.number %}class="active"{% endif %}>
                         {{ num }}
                     </button>
                 {% endif %}
-
             {% endfor %}
 
-            <!-- Siguiente -->
-            <button onclick="goPage({{ page_obj.number|add:'1' }})"
+            <button type="button" onclick="goPage({{ page_obj.number|add:'1' }})"
                 {% if not page_obj.has_next %}disabled{% endif %}>▶</button>
 
-            <!-- Final -->
-            <button onclick="goPage({{ page_obj.paginator.num_pages }})"
+            <button type="button" onclick="goPage({{ page_obj.paginator.num_pages }})"
                 {% if page_obj.number == page_obj.paginator.num_pages %}disabled{% endif %}>⏭</button>
 
         </div>
@@ -88,7 +92,7 @@
         <div class="grid-footer-right">
             <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
             <span>
-                Registros filtrados {{ page_obj.paginator.count }} 
+                Registros filtrados {{ page_obj.paginator.count }}
                 de {{ total_registros|default:page_obj.paginator.count }}
             </span>
         </div>
@@ -96,3 +100,65 @@
     </div>
 
 </div>
+
+{% if grid_urls %}
+
+<div class="grid-actions-bottom actions-right">
+
+    <button id="btn_ver"
+            type="button"
+            onclick="accion('ver')"
+            disabled
+            class="btn-secondary">
+        Ver
+    </button>
+
+    <button id="btn_editar"
+            type="button"
+            onclick="accion('editar')"
+            disabled
+            class="btn-primary">
+        Editar
+    </button>
+
+    <button id="btn_eliminar"
+            type="button"
+            onclick="accion('eliminar')"
+            disabled
+            class="btn-danger">
+        Eliminar
+    </button>
+
+    <button id="btn_nuevo"
+            type="button"
+            onclick="accion('nuevo')"
+            class="btn-primary">
+        Nuevo
+    </button>
+
+    {% if lookup.target and lookup.return %}
+        <button id="btn_seleccionar"
+                type="button"
+                onclick="accionSeleccionar()"
+                disabled
+                class="btn-primary">
+            Seleccionar
+        </button>
+
+        <button id="btn_cancelar_select"
+                type="button"
+                onclick="cancelarSeleccion()"
+                class="btn-secondary">
+            Cancelar
+        </button>
+    {% endif %}
+
+</div>
+
+{% endif %}
+
+<script>
+    const GRID_STATE = {{ state|safe }};
+    const BASE_QUERY = "{{ base_query|escapejs }}";
+    const LOOKUP = {{ lookup|safe }};
+</script>

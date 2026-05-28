@@ -13,19 +13,45 @@
 
 <form method="post" class="form-card">
     {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
 
-    {{ form.as_p }}
+    <div class="form-col">
+        {% for field in form %}
+        <div class="form-row">
 
-    <div class="form-actions">
+            <label for="{{ field.id_for_label }}">
+                {{ field.label }}
+            </label>
 
-        <a href="{% url 'calidad' %}">Volver</a>
+            <div class="form-field">
+                
+                {{ field }}
 
-        {% if modo != "ver" %}
-            <button type="submit">Guardar</button>
-        {% endif %}
-
+                {% if field.errors %}
+                    <div class="form-error">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
     </div>
 
+    <div class="form-actions" style="display:flex; justify-content:flex-end; gap:10px;">
+
+        {% if modo != "ver" %}
+            <button type="submit" class="btn-primary">
+                Guardar
+            </button>
+        {% endif %}
+
+        <button type="button"
+                onclick="window.location.href='{% url 'calidad' %}{% if next %}?{{ next }}{% endif %}'"
+                class="btn-secondary">
+            Cancelar
+        </button>
+
+    </div>
 </form>
 
 {% endblock %}

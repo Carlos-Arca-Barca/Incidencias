@@ -11,33 +11,129 @@
 </head>
 
 <body>
+    <div class="layout-erp">
 
-<header>
-    <h1>Gestión de Incidencias</h1>
+        <aside class="sidebar" id="sidebar">
+            <button class="toggle-btn" type="button" onclick="toggleSidebar()">☰</button>
 
-    <div class="user-info">
-    <span>{{ user.username }}</span>
+            <h2 class="logo" onclick="toggleSidebar()">
+                <span class="icon">📊</span>
+                <span class="text">Incidencias</span>
+            </h2>
 
-    <form action="{% url 'logout' %}" method="post" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-    </form>
-</div>
-</header>
+            <a href="{% url 'home' %}" class="menu-item">
+                <span class="icon">🏠</span>
+                <span class="text">Inicio</span>
+            </a>
 
-<nav>
-    <a href="{% url 'home' %}">Inicio</a>
-    <a href="{% url 'calidad' %}">Calidad</a>
+            <a href="{% url 'incidencias' %}" class="menu-item">
+                <span class="icon">🧾</span>
+                <span class="text">Incidencias</span>
+            </a>
 
-    {% if user.is_staff %}
-        <a href="{% url 'admin:index' %}">Admin</a>
-    {% endif %}
-</nav>
+            <div class="submenu">
+                <a href="#" class="menu-item submenu-toggle" onclick="toggleSubmenu(event)">
+                    <span class="icon">🧩</span>
+                    <span class="text">Auxiliares ▾</span>
+                </a>
 
-<main class="main-content">
-    {% block content %}
-    {% endblock %}
-</main>
+                <div class="submenu-items">
+                    <a href="{% url 'calidad' %}" class="menu-item">
+                        <span class="icon">✔</span>
+                        <span class="text">Calidad</span>
+                    </a>
+                    <a href="{% url 'categorias' %}" class="menu-item">
+                        <span class="icon">📂</span>
+                        <span class="text">Categorías</span>
+                    </a>
+
+                    <a href="{% url 'comerciales' %}" class="menu-item">
+                        <span class="icon">💼</span>
+                        <span class="text">Comerciales</span>
+                    </a>
+
+                    <a href="{% url 'representantes' %}" class="menu-item">
+                        <span class="icon">👤</span>
+                        <span class="text">Representantes</span>
+                    </a>
+
+                     <a href="{% url 'clientes' %}" class="menu-item">
+                        <span class="icon">👤</span>
+                        <span class="text">Clientes</span>
+                    </a>
+                    
+                </div>
+            </div>
+
+            {% if user.is_staff %}
+                <a href="{% url 'admin:index' %}" class="menu-item">
+                    <span class="icon">⚙</span>
+                    <span class="text">Admin</span>
+                </a>
+            {% endif %}
+        </aside>
+
+        <div class="main-area">
+            <header>
+                {% if messages %}
+                    <div class="messages-container">
+                        {% for message in messages %}
+                            <div class="alert {{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <h1>Gestión de Incidencias</h1>
+
+                <div class="user-info">
+                    {% if user.is_authenticated %}
+                        <span>{{ user.username }}</span>
+
+                        <form action="{% url 'logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit">Logout</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </header>
+
+            <main class="main-content">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            const collapsed = sidebar.classList.toggle("collapsed");
+
+            if (collapsed) {
+                sidebar.querySelectorAll(".submenu.open").forEach((submenu) => {
+                    submenu.classList.remove("open");
+                });
+            }
+        }
+
+        function toggleSubmenu(event) {
+            event.preventDefault();
+
+            const sidebar = document.getElementById("sidebar");
+
+            if (sidebar.classList.contains("collapsed")) {
+                sidebar.classList.remove("collapsed");
+                return;
+            }
+
+            const submenu = event.currentTarget.closest(".submenu");
+            submenu.classList.toggle("open");
+        }
+    </script>
+
+<script src="{% static 'js/lookup.js' %}"></script>
 
 </body>
 </html>

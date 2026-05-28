@@ -17,21 +17,15 @@ class Calidad(models.Model):
         verbose_name="Notas",
     )
 
-    GRID_COLUMNS = [
-        {"field": "codigo", "label": "Código"},
-        {"field": "descripcion", "label": "Descripción"},
-        {"field": "notas", "label": "Notas"},
-    ]
-
     def __str__(self):
-        return f"{self.codigo} - {self.descripcion}"
+        return self.descripcion
 
     class Meta:
         verbose_name = "Calidad"
         verbose_name_plural = "Calidades"
         ordering = ["codigo"]
 
-
+    
 class Categoria(models.Model):
     codigo = models.CharField(
         max_length=10,
@@ -48,7 +42,7 @@ class Categoria(models.Model):
     )
 
     def __str__(self):
-        return f"{self.codigo} - {self.descripcion}"
+        return self.descripcion
 
     class Meta:
         verbose_name = "Categoría"
@@ -78,7 +72,7 @@ class Comercial(models.Model):
     )
 
     def __str__(self):
-        return f"{self.codigo} - {self.descripcion}"
+        return self.descripcion
 
     class Meta:
         verbose_name = "Comercial"
@@ -104,7 +98,7 @@ class Representante(models.Model):
     )
 
     def __str__(self):
-        return f"{self.codigo} - {self.descripcion}"
+        return self.descripcion
 
     class Meta:
         verbose_name = "Representante"
@@ -130,7 +124,7 @@ class Cliente(models.Model):
     )
 
     def __str__(self):
-        return f"{self.codigo} - {self.descripcion}"
+        return self.descripcion
 
     class Meta:
         verbose_name = "Cliente"
@@ -208,7 +202,7 @@ class Accion(models.Model):
     )
 
     def __str__(self):
-        return f"{self.codigo} - {self.descripcion}"
+        return self.descripcion
 
     class Meta:
         verbose_name = "Acción"
@@ -217,11 +211,7 @@ class Accion(models.Model):
 
 
 class Incidencia(models.Model):
-    codigo = models.CharField(
-        max_length=20,
-        unique=True,
-        verbose_name="Código",
-    )
+
     descripcion = models.CharField(
         max_length=40,
         verbose_name="Descripción",
@@ -233,12 +223,14 @@ class Incidencia(models.Model):
         related_name="incidencias",
         verbose_name="Cliente",
     )
+
     calidad = models.ForeignKey(
         "Calidad",
         on_delete=models.PROTECT,
         related_name="incidencias",
         verbose_name="Calidad",
     )
+
     categoria = models.ForeignKey(
         "Categoria",
         on_delete=models.PROTECT,
@@ -254,14 +246,17 @@ class Incidencia(models.Model):
     fecha_apertura = models.DateTimeField(
         verbose_name="Fecha apertura",
     )
+
     fecha_ultimo = models.DateTimeField(
         verbose_name="Última actualización",
     )
+
     fecha_cierre = models.DateTimeField(
         blank=True,
         null=True,
         verbose_name="Fecha cierre",
     )
+
     fecha_control = models.DateTimeField(
         blank=True,
         null=True,
@@ -272,6 +267,7 @@ class Incidencia(models.Model):
         default=False,
         verbose_name="Cerrado",
     )
+
     control = models.BooleanField(
         default=False,
         verbose_name="Control",
@@ -283,12 +279,14 @@ class Incidencia(models.Model):
         related_name="incidencias_abiertas",
         verbose_name="Usuario apertura",
     )
+
     usuario_actualizacion = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
         related_name="incidencias_actualizadas",
         verbose_name="Usuario última actualización",
     )
+
     usuario_cierre = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
@@ -297,6 +295,7 @@ class Incidencia(models.Model):
         null=True,
         verbose_name="Usuario cierre",
     )
+
     usuario_control = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
@@ -306,13 +305,65 @@ class Incidencia(models.Model):
         verbose_name="Usuario control",
     )
 
+    # =========================
+    # CAMPOS CALCULADOS
+    # =========================
+
+    @property
+    def codigo(self):
+
+        if not self.id:
+            return "INC_00000"
+
+        return f"INC_{self.id:05d}"
+
+    @property
+    def codigo_visual(self):
+
+        return self.codigo
+    
+    @property
+    def cliente_visual(self):
+
+        if self.cliente_id and self.cliente:
+            return self.cliente.descripcion
+
+        return ""
+
+    @property
+    def representante(self):
+
+        if (
+            self.cliente_id
+            and self.cliente
+            and self.cliente.representante_id
+        ):
+            return self.cliente.representante
+
+        return None
+
+    @property
+    def comercial(self):
+
+        representante = self.representante
+
+        if (
+            representante
+            and representante.comercial_id
+        ):
+            return representante.comercial
+
+        return None
+
     def __str__(self):
+
         return self.codigo
 
     class Meta:
         verbose_name = "Incidencia"
         verbose_name_plural = "Incidencias"
         ordering = ["-fecha_apertura"]
+
         indexes = [
             models.Index(fields=["cliente"]),
             models.Index(fields=["fecha_apertura"]),
@@ -321,34 +372,41 @@ class Incidencia(models.Model):
 
 
 class Detalle(models.Model):
+
     incidencia = models.ForeignKey(
         "Incidencia",
         on_delete=models.CASCADE,
         related_name="detalles",
         verbose_name="Incidencia",
     )
+
     descripcion = models.CharField(
         max_length=40,
         verbose_name="Descripción",
     )
+
     tipo = models.CharField(
         max_length=10,
         verbose_name="Tipo",
     )
+
     fecha = models.DateTimeField(
         verbose_name="Fecha",
     )
+
     fecha_control = models.DateTimeField(
         blank=True,
         null=True,
         verbose_name="Fecha control",
     )
+
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
         related_name="detalles_creados",
         verbose_name="Usuario",
     )
+
     usuario_control = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
@@ -357,27 +415,32 @@ class Detalle(models.Model):
         null=True,
         verbose_name="Usuario control",
     )
+
     adjunto = models.CharField(
         max_length=255,
         blank=True,
         verbose_name="Adjunto",
     )
+
     notas = models.TextField(
         blank=True,
         verbose_name="Notas",
     )
+
     control = models.BooleanField(
         default=False,
         verbose_name="Control",
     )
 
     def __str__(self):
-        return f"{self.incidencia.codigo} - {self.descripcion}"
+
+        return self.descripcion
 
     class Meta:
         verbose_name = "Detalle"
         verbose_name_plural = "Detalles"
         ordering = ["fecha"]
+
         indexes = [
             models.Index(fields=["incidencia"]),
             models.Index(fields=["fecha"]),
@@ -385,6 +448,7 @@ class Detalle(models.Model):
 
 
 class Configuracion(models.Model):
+
     nombre_empresa = models.CharField(
         max_length=40,
         verbose_name="Nombre empresa",
@@ -395,14 +459,17 @@ class Configuracion(models.Model):
         blank=True,
         verbose_name="Email Dirección General",
     )
+
     dir_general_apertura = models.BooleanField(
         default=False,
         verbose_name="DG - Apertura",
     )
+
     dir_general_cierre = models.BooleanField(
         default=False,
         verbose_name="DG - Cierre",
     )
+
     dir_general_reapertura = models.BooleanField(
         default=False,
         verbose_name="DG - Reapertura",
@@ -413,14 +480,17 @@ class Configuracion(models.Model):
         blank=True,
         verbose_name="Email Dirección Comercial",
     )
+
     dir_comercial_apertura = models.BooleanField(
         default=False,
         verbose_name="DC - Apertura",
     )
+
     dir_comercial_cierre = models.BooleanField(
         default=False,
         verbose_name="DC - Cierre",
     )
+
     dir_comercial_reapertura = models.BooleanField(
         default=False,
         verbose_name="DC - Reapertura",
@@ -431,14 +501,17 @@ class Configuracion(models.Model):
         blank=True,
         verbose_name="Email Calidad",
     )
+
     dpt_calidad_apertura = models.BooleanField(
         default=False,
         verbose_name="Calidad - Apertura",
     )
+
     dpt_calidad_cierre = models.BooleanField(
         default=False,
         verbose_name="Calidad - Cierre",
     )
+
     dpt_calidad_reapertura = models.BooleanField(
         default=False,
         verbose_name="Calidad - Reapertura",
@@ -448,10 +521,12 @@ class Configuracion(models.Model):
         default=False,
         verbose_name="Comercial - Apertura",
     )
+
     comercial_cierre = models.BooleanField(
         default=False,
         verbose_name="Comercial - Cierre",
     )
+
     comercial_reapertura = models.BooleanField(
         default=False,
         verbose_name="Comercial - Reapertura",
@@ -462,14 +537,17 @@ class Configuracion(models.Model):
         blank=True,
         verbose_name="Otros emails",
     )
+
     otros_apertura = models.BooleanField(
         default=False,
         verbose_name="Otros - Apertura",
     )
+
     otros_cierre = models.BooleanField(
         default=False,
         verbose_name="Otros - Cierre",
     )
+
     otros_reapertura = models.BooleanField(
         default=False,
         verbose_name="Otros - Reapertura",
@@ -480,6 +558,7 @@ class Configuracion(models.Model):
         null=True,
         verbose_name="Tamaño máximo adjunto",
     )
+
     tamano_maximo_adjuntos = models.PositiveIntegerField(
         blank=True,
         null=True,
@@ -496,19 +575,23 @@ class Configuracion(models.Model):
         null=True,
         verbose_name="Logotipo",
     )
+
     fecha_licencia = models.TextField(
         blank=True,
         verbose_name="Fecha licencia",
     )
 
     def __str__(self):
+
         return "Configuración del sistema"
-    
+
     def save(self, *args, **kwargs):
+
         self.pk = 1
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
+
         raise Exception("No se puede eliminar Configuración")
 
     class Meta:
@@ -517,44 +600,53 @@ class Configuracion(models.Model):
 
 
 class PerfilUsuario(models.Model):
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="perfil",
         verbose_name="Usuario Django",
     )
+
     codigo = models.CharField(
         max_length=10,
         unique=True,
         verbose_name="Código",
     )
+
     descripcion = models.CharField(
         max_length=40,
         verbose_name="Descripción",
     )
+
     sistema = models.BooleanField(
         default=False,
         verbose_name="Usuario de sistema",
     )
+
     modo = models.CharField(
         max_length=10,
         blank=True,
         verbose_name="Modo",
     )
+
     notas = models.TextField(
         blank=True,
         verbose_name="Notas",
     )
+
     password_change = models.BooleanField(
         default=False,
         verbose_name="Debe cambiar contraseña",
     )
+
     activo = models.BooleanField(
         default=True,
         verbose_name="Activo",
     )
 
     def __str__(self):
+
         return self.codigo
 
     class Meta:

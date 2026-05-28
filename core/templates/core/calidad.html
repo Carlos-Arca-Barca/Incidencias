@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
@@ -6,214 +7,67 @@
     <h1 class="page-title">Calidad</h1>
 </div>
 
-<form class="filtros">
+<form class="filtros" onsubmit="return false;">
+    {% for filtro in grid_filters %}
+        <div class="filtro">
+            <label>{{ filtro.label }}</label>
 
-    <div class="filtro">
-        <label>Código</label>
-        <input type="text" name="codigo" value="{{ request.GET.codigo|default:'' }}" onkeyup="autoFilter()">
-    </div>
+            {% if filtro.type == "textarea" %}
+                <textarea name="{{ filtro.field }}" onkeyup="autoFilter()">{{ filtro.value|default:'' }}</textarea>
 
-    <div class="filtro">
-        <label>Descripción</label>
-        <input type="text" name="descripcion" value="{{ request.GET.descripcion|default:'' }}" onkeyup="autoFilter()">
-    </div>
+            {% elif filtro.type == "select" %}
+                <select name="{{ filtro.field }}" onchange="autoFilter()">
+                    {% for opcion in filtro.options %}
+                        <option value="{{ opcion.value }}" {% if opcion.value == filtro.value %}selected{% endif %}>
+                            {{ opcion.label }}
+                        </option>
+                    {% endfor %}
+                </select>
 
-    <div class="filtro">
-        <label>Notas</label>
-        <input type="text" name="notas" value="{{ request.GET.notas|default:'' }}" onkeyup="autoFilter()">
-    </div>
-
+            {% else %}
+                <input
+                    type="{{ filtro.type|default:'text' }}"
+                    name="{{ filtro.field }}"
+                    value="{{ filtro.value|default:'' }}"
+                    onkeyup="autoFilter()"
+                >
+            {% endif %}
+        </div>
+    {% endfor %}
 </form>
 
 <div class="grid-actions">
-
     <button type="button" onclick="refreshGrid()">Filtrar</button>
     <button type="button" onclick="limpiar()">Limpiar</button>
-
 </div>
 
 <hr>
 
 <div id="grid-container">
     {% include "components/grid.html" %}
-    <div class="grid-actions-bottom">
-
-    <button id="btn_ver" disabled onclick="accion('ver')">Ver</button>
-    <button id="btn_editar" disabled onclick="accion('editar')">Editar</button>
-    <button id="btn_eliminar" disabled onclick="accion('eliminar')">Eliminar</button>
-
-    <button id="btn_nuevo" onclick="accion('nuevo')">Nuevo</button>
-
-</div>
 </div>
 
 <script>
+const GRID_URLS = {
+    ver: "{{ grid_urls.ver }}",
+    editar: "{{ grid_urls.editar }}",
+    eliminar: "{{ grid_urls.eliminar }}",
+    nuevo: "{{ grid_urls.nuevo }}"
+};
+</script>
 
-let timer = null;
+<script src="{% static 'js/grid.js' %}"></script>
 
-/* =========================
-   ESTADO ÚNICO
-========================= */
-function getState() {
-    const form = document.querySelector(".filtros");
-    const url = new URL(window.location.href);
-
-    return {
-        codigo: form.codigo.value,
-        descripcion: form.descripcion.value,
-        notas: form.notas.value,
-        orden: url.searchParams.get("orden") || "codigo",
-        dir: url.searchParams.get("dir") || "asc",
-        page: url.searchParams.get("page") || "1"
-    };
-}
-
-/* =========================
-   URL BUILDER ÚNICO
-========================= */
-function buildURL(overrides = {}) {
-    const s = { ...getState(), ...overrides };
-
-    const params = new URLSearchParams();
-
-    if (s.codigo) params.set("codigo", s.codigo);
-    if (s.descripcion) params.set("descripcion", s.descripcion);
-    if (s.notas) params.set("notas", s.notas);
-
-    params.set("orden", s.orden);
-    params.set("dir", s.dir);
-    params.set("page", s.page);
-
-    return params.toString();
-}
-
-/* =========================
-   REFRESH GENERAL
-========================= */
-function refreshGrid() {
-    window.location.search = buildURL({ page: 1 });
-}
-
-/* =========================
-   FILTRO CON DEBOUNCE
-========================= */
-function autoFilter() {
-    clearTimeout(timer);
-
-    timer = setTimeout(() => {
-        window.location.search = buildURL({ page: 1 });
-    }, 400);
-}
-
-/* =========================
-   PAGINACIÓN
-========================= */
-function goPage(p) {
-    window.location.search = buildURL({ page: p });
-}
-
-/* =========================
-   ORDENACIÓN
-========================= */
-function sortBy(field) {
-
-    const state = getState();
-
-    let dir = "asc";
-
-    if (state.orden === field) {
-        dir = state.dir === "asc" ? "desc" : "asc";
-    }
-
-    window.location.search = buildURL({
-        orden: field,
-        dir: dir,
-        page: 1
-    });
-}
-
-/* =========================
-   LIMPIAR
-========================= */
-function limpiar() {
-    document.querySelectorAll(".filtros input").forEach(i => i.value = "");
-
-    window.location.search = buildURL({
-        codigo: "",
-        descripcion: "",
-        notas: "",
-        orden: "codigo",
-        dir: "asc",
-        page: 1
-    });
-}
-
-/* =========================
-   SELECCIÓN FILA
-========================= */
-function selectRow(row) {
-
-    document.querySelectorAll(".row")
-        .forEach(r => r.classList.remove("selected"));
-
-    row.classList.add("selected");
-
-    updateButtonsState();
-}
-
-function getSelectedRow() {
-    return document.querySelector(".row.selected");
-}
-
-function getSelectedId() {
-    const row = getSelectedRow();
-    return row ? row.dataset.id : null;
-}
-
-function updateButtonsState() {
-    const hasSelection = getSelectedRow() !== null;
-
-    ["btn_ver", "btn_editar", "btn_eliminar"].forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) btn.disabled = !hasSelection;
-    });
-}
-
-
-function accion(tipo) {
-
-    const id = getSelectedId();
-
-    if (tipo !== "nuevo" && !id) {
-        alert("Selecciona un registro");
-        return;
-    }
-
-    if (tipo === "nuevo") {
-        window.location.href = "/calidad/nuevo/";
-        return;
-    }
-
-    if (tipo === "ver") {
-        window.location.href = `/calidad/${id}/`;
-    }
-
-    if (tipo === "editar") {
-        window.location.href = `/calidad/${id}/editar/`;
-    }
-
-    if (tipo === "eliminar") {
-        window.location.href = `/calidad/${id}/eliminar/`;
-    }
-}
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    updateButtonsState();
+<script>
+initGrid({
+    urls: GRID_URLS,
+    buttons: [
+        { id: "btn_ver", requiresSelection: true },
+        { id: "btn_editar", requiresSelection: true },
+        { id: "btn_eliminar", requiresSelection: true },
+        { id: "btn_nuevo", requiresSelection: false }
+    ]
 });
-
-
-
 </script>
 
 {% endblock %}

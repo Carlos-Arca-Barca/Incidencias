@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1 class="page-title">
+
+        {% if modo == "nuevo" %}Nueva{% endif %}
+        {% if modo == "editar" %}Editar{% endif %}
+        {% if modo == "ver" %}Ver{% endif %}
+
+        Incidencia
+
+    </h1>
+
+    {% if form.instance.id %}
+    <div style="margin-top:10px; font-size:18px;">
+        <strong>Código:</strong> {{ form.instance.codigo }}
+    </div>
+    {% endif %}
+
+</div>
+
+<form method="post"
+      class="form-card"
+      id="incidencia-form"
+      data-lookup-storage="incidencia_form_state"
+      data-cancel-url="{% url 'incidencias' %}{% if next %}?{{ next }}{% endif %}">
+
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+
+    <div class="form-col">
+
+        {% for field in form %}
+
+        <div class="form-row">
+
+            <label for="{{ field.id_for_label }}">
+                {{ field.label }}
+            </label>
+
+            <div class="form-field">
+
+                {% if field.name == "cliente" %}
+
+                    <div style="display:flex; gap:8px; align-items:center;">
+
+                        <div style="flex:1;">
+                            {{ field }}
+                        </div>
+
+                        {% if modo != "ver" %}
+                        <button type="button"
+                                class="btn-secondary"
+                                data-lookup-url="{% url 'clientes' %}"
+                                data-lookup-target="id_cliente"
+                                onclick="Lookup.open(this)">
+                            🔍
+                        </button>
+                        {% endif %}
+
+                    </div>
+
+                {% elif field.name == "representante_display" %}
+
+                    <input type="text"
+                           id="id_representante_display"
+                           name="representante_display"
+                           class="form-control"
+                           readonly
+                           style="background:#f2f2f2;">
+
+                {% elif field.name == "comercial_display" %}
+
+                    <input type="text"
+                           id="id_comercial_display"
+                           name="comercial_display"
+                           class="form-control"
+                           readonly
+                           style="background:#f2f2f2;">
+
+                {% elif field.name == "calidad" %}
+
+                    <div style="display:flex; gap:8px; align-items:center;">
+
+                        <div style="flex:1;">
+                            {{ field }}
+                        </div>
+
+                        {% if modo != "ver" %}
+                        <button type="button"
+                                class="btn-secondary"
+                                data-lookup-url="{% url 'calidad' %}"
+                                data-lookup-target="id_calidad"
+                                onclick="Lookup.open(this)">
+                            🔍
+                        </button>
+                        {% endif %}
+
+                    </div>
+
+                {% elif field.name == "categoria" %}
+
+                    <div style="display:flex; gap:8px; align-items:center;">
+
+                        <div style="flex:1;">
+                            {{ field }}
+                        </div>
+
+                        {% if modo != "ver" %}
+                        <button type="button"
+                                class="btn-secondary"
+                                data-lookup-url="{% url 'categorias' %}"
+                                data-lookup-target="id_categoria"
+                                onclick="Lookup.open(this)">
+                            🔍
+                        </button>
+                        {% endif %}
+
+                    </div>
+
+                {% else %}
+
+                    {{ field }}
+
+                {% endif %}           
+                 
+                {% if field.errors %}
+                    <div class="form-error">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <hr>
+
+    <div id="detalle-grid-container">
+        <!-- Aquí irá el grid de Detalles -->
+    </div>
+
+    <div class="form-actions"
+         style="display:flex; justify-content:flex-end; gap:10px;">
+
+        {% if modo != "ver" %}
+            <button type="submit" class="btn-primary">
+                Guardar
+            </button>
+        {% endif %}
+
+        <button type="button"
+                class="btn-secondary"
+                onclick="window.location.href='{% url 'incidencias' %}{% if next %}?{{ next }}{% endif %}'">
+            Cancelar
+        </button>
+
+    </div>
+
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // =========================
+    // ELEMENTOS
+    // =========================
+    const clienteField = document.getElementById("id_cliente");
+    const representanteField = document.getElementById("id_representante");
+    const representanteDisplay = document.getElementById("id_representante_display");
+    const comercialDisplay = document.getElementById("id_comercial_display");
+
+    // =========================
+    // FUNCIÓN CENTRAL
+    // =========================
+    async function loadClienteData(clienteId) {
+
+        if (!clienteId) {
+            if (representanteField) representanteField.value = "";
+            if (representanteDisplay) representanteDisplay.value = "";
+            if (comercialDisplay) comercialDisplay.value = "";
+            return;
+        }
+
+        try {
+            const response = await fetch(`/ajax/cliente/${clienteId}/info/`);
+            const data = await response.json();
+
+            // =========================
+            // REPRESENTANTE
+            // =========================
+            if (representanteField) {
+                representanteField.value = data.representante_id || "";
+            }
+
+            if (representanteDisplay) {
+                representanteDisplay.value = data.representante || "";
+            }
+
+            // =========================
+            // COMERCIAL
+            // =========================
+            if (comercialDisplay) {
+                comercialDisplay.value = data.comercial || "";
+            }
+
+        } catch (error) {
+            console.error("Error cargando cliente:", error);
+
+            if (representanteField) representanteField.value = "";
+            if (representanteDisplay) representanteDisplay.value = "";
+            if (comercialDisplay) comercialDisplay.value = "";
+        }
+    }
+
+    // =========================
+    // EVENTO CLIENTE
+    // =========================
+    if (clienteField) {
+
+        clienteField.addEventListener("change", function () {
+            loadClienteData(this.value);
+        });
+
+        // carga inicial (editar/ver)
+        if (clienteField.value) {
+            loadClienteData(clienteField.value);
+        }
+    }
+
+    // =========================
+    // INTEGRACIÓN CON LUPA
+    // =========================
+    window.setCliente = function (clienteId) {
+
+        if (clienteField) {
+            clienteField.value = clienteId;
+
+            // 🔥 importante: dispara flujo completo
+            clienteField.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+    };
+
+});
+</script>
+
+{% endblock %}
