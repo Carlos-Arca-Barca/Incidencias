@@ -27,7 +27,7 @@ def grid_view(request, config=None):
     # =========================
 
     filters = config.get("filters", {})
-
+    
     grid_filters = None
 
     # =====================================================
@@ -88,7 +88,7 @@ def grid_view(request, config=None):
                 # -------------------------
                 # BOOLEANOS
                 # -------------------------
-                elif ftype == "boolean":
+                elif ftype in ("boolean", "bool"):
 
                     item["value"] = request.GET.get(
                         field,

@@ -5,6 +5,7 @@ from .models import Representante
 from .models import Cliente
 from .models import Incidencia
 from .models import Detalle
+from .models import Accion
 
 
 CALIDAD_GRID = {
@@ -149,6 +150,59 @@ CLIENTE_GRID = {
         "nuevo": "cliente_nuevo",
     }
 }
+
+
+ACCION_GRID = {
+
+    "model": Accion,
+
+    "template": "core/accion.html",
+
+    "columns": [
+
+        {"field": "codigo", "label": "Código", "sortable": True, "width": "120px"},
+        {"field": "descripcion", "label": "Descripción", "sortable": True, "width": "200px"},
+
+        {"field": "es_sistema", "label": "Sistema", "sortable": True, "width": "90px"},
+        {"field": "genera_detalle", "label": "Detalle", "sortable": True, "width": "90px"},
+        {"field": "detalle_tipo", "label": "Tipo detalle", "sortable": True, "width": "120px"},
+        {"field": "detalle_descripcion", "label": "Descripción detalle", "sortable": True, "width": "150px"},
+        {"field": "enviar_email", "label": "Email", "sortable": True, "width": "90px"},
+        {"field": "email_subject", "label": "Asunto email", "sortable": True, "width": "200px"},
+        {"field": "email_attachments", "label": "Adjuntos", "sortable": True, "width": "90px"},
+    ],
+
+    "filters": {
+
+        "general": [
+            {"field": "codigo", "label": "Código", "type": "text"},
+            {"field": "descripcion", "label": "Descripción", "type": "text"},
+
+            {"field": "detalle_tipo", "label": "Tipo detalle", "type": "text"},
+            {"field": "detalle_descripcion", "label": "Descripción detalle", "type": "text"},
+
+            {"field": "email_subject", "label": "Asunto email", "type": "text"},
+        ],
+        
+        "booleanos": [
+            {"field": "es_sistema", "label": "Sistema", "type": "boolean"},
+            {"field": "genera_detalle", "label": "Genera detalle", "type": "boolean"},
+            {"field": "enviar_email", "label": "Enviar email", "type": "boolean"},
+            {"field": "email_attachments", "label": "Adjuntos email", "type": "boolean"},
+            {"field": "email_editable", "label": "Editable email", "type": "boolean"},
+        ],
+    },
+
+    "page_size": 10,
+
+    "actions": {
+        "ver": "accion_ver",
+        "editar": "accion_editar",
+        "eliminar": "accion_eliminar",
+        "nuevo": "accion_nuevo",
+    }
+}
+
 
 INCIDENCIA_GRID = {
 

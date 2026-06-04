@@ -155,12 +155,16 @@ class Accion(models.Model):
         verbose_name="Tipo de detalle",
         max_length=10,
         blank=True,
+        null=True,
     )
+
     detalle_descripcion = models.CharField(
         verbose_name="Descripción del detalle",
         max_length=40,
         blank=True,
+        null=True,
     )
+    
     detalle_notas = models.TextField(
         verbose_name="Notas del detalle",
         blank=True,
@@ -175,14 +179,16 @@ class Accion(models.Model):
         max_length=254,
         blank=True,
     )
-    email_cc = models.TextField(
+    email_cc = models.EmailField(
         verbose_name="CC",
         blank=True,
     )
-    email_bcc = models.TextField(
+
+    email_bcc = models.EmailField(
         verbose_name="BCC",
         blank=True,
     )
+    
     email_subject = models.CharField(
         verbose_name="Asunto",
         max_length=254,

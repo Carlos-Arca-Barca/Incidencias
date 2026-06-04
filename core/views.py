@@ -28,6 +28,9 @@ from .forms import ClienteForm
 from .models import Incidencia
 from .forms import IncidenciaForm
 
+from .models import Accion
+from .forms import AccionForm
+
 
 
 def home(request):
@@ -1008,6 +1011,161 @@ def cliente_eliminar(request, id):
     })
 
 
+# =========================
+# ACCION
+# =========================
+
+def accion_ver(request, id):
+
+    obj = safe_get_object(
+        Accion,
+        id,
+        request,
+        "acciones"
+    )
+
+    if not isinstance(obj, Accion):
+        return obj
+
+    form = AccionForm(instance=obj)
+
+    for f in form.fields.values():
+        f.disabled = True
+
+    return render(request, "core/accion_form.html", {
+        "form": form,
+        "modo": "ver",
+        "id": id,
+        "next": request.GET.get("next", ""),
+    })
+
+
+def accion_editar(request, id):
+
+    obj = safe_get_object(
+        Accion,
+        id,
+        request,
+        "acciones"
+    )
+
+    if not isinstance(obj, Accion):
+        return obj
+
+    next_url = request.POST.get("next") or request.GET.get("next", "")
+
+    if request.method == "POST":
+        form = AccionForm(request.POST, instance=obj)
+
+        # 🔴 DEBUG IMPORTANTE (solo temporal)
+        print("EMAIL FIELD TYPE:", type(form.fields["email_to"]))
+        print("EMAIL VALUE POST:", request.POST.get("email_to"))
+
+        if form.is_valid():
+            form.save()
+
+            base_url = reverse("acciones")
+            return redirect(f"{base_url}?{next_url}" if next_url else base_url)
+
+        else:
+            print("FORM ERRORS:", form.errors)
+
+    else:
+        form = AccionForm(instance=obj)
+
+    return render(request, "core/accion_form.html", {
+        "form": form,
+        "modo": "editar",
+        "id": id,
+        "next": next_url,
+    })
+
+def accion_nuevo(request):
+
+    next_url = request.POST.get("next") or request.GET.get("next", "")
+    next_params = _query_params_from_string(next_url)
+
+    for key in ("select", "target", "return"):
+        value = request.POST.get(key) or request.GET.get(key)
+        if value:
+            next_params[key] = value
+
+    if request.method == "POST":
+
+        form = AccionForm(request.POST)
+
+        if form.is_valid():
+
+            obj = form.save()
+
+            from .utils.grid import build_grid
+
+            grid_data = build_grid(
+                request=request,
+                qs=Accion.objects.all(),
+                columnas=[],
+                page_size=10,
+                grid_config=None
+            )
+
+            qs = grid_data["final_queryset"]
+            ids = list(qs.values_list("id", flat=True))
+
+            try:
+                pos = ids.index(obj.id) + 1
+                page_size = 10
+                page = ((pos - 1) // page_size) + 1
+            except ValueError:
+                page = 1
+
+            final_params = dict(next_params)
+            final_params["page"] = str(page)
+            final_params["selected"] = str(obj.id)
+
+            url = reverse("acciones")
+            query = urlencode(final_params)
+
+            return redirect(f"{url}?{query}")
+
+    else:
+        form = AccionForm()
+
+    return render(request, "core/accion_form.html", {
+        "form": form,
+        "modo": "nuevo",
+        "next": next_url,
+    })
+
+
+def accion_eliminar(request, id):
+
+    obj = safe_get_object(
+        Accion,
+        id,
+        request,
+        "acciones"
+    )
+
+    if not isinstance(obj, Accion):
+        return obj
+
+    next_url = request.POST.get("next") or request.GET.get("next", "")
+
+    if request.method == "POST":
+
+        _, _ = safe_delete(request, obj, None)
+
+        base_url = reverse("acciones")
+
+        return redirect(
+            f"{base_url}?{next_url}" if next_url else base_url
+        )
+
+    return render(request, "core/accion_confirm_delete.html", {
+        "obj": obj,
+        "next": next_url,
+    })
+
 
 # =========================
 # INCIDENCIA
@@ -1063,16 +1221,17 @@ def incidencia_editar(request, id):
 
         if form.is_valid():
 
+            # =========================
+            # BLOQUEO REAL DE NEGOCIO
+            # =========================
+            if obj.cerrado:
+                base_url = reverse("incidencias")
+                return redirect(
+                    f"{base_url}?{next_url}"
+                    if next_url else base_url
+                )
+
             incidencia = form.save(commit=False)
-
-            incidencia.fecha_ultimo = timezone.now()
-            incidencia.usuario_actualizacion = request.user
-
-            if incidencia.cerrado and not incidencia.fecha_cierre:
-                incidencia.fecha_cierre = timezone.now()
-
-            if incidencia.cerrado and not incidencia.usuario_cierre:
-                incidencia.usuario_cierre = request.user
 
             incidencia.save()
 
@@ -1086,6 +1245,14 @@ def incidencia_editar(request, id):
     else:
 
         form = IncidenciaForm(instance=obj)
+
+        # =========================
+        # SI ESTÁ CERRADA → TODO READONLY
+        # =========================
+        if obj.cerrado:
+
+            for field in form.fields.values():
+                field.disabled = True
 
     return render(request, "core/incidencia_form.html", {
 
@@ -1117,15 +1284,27 @@ def incidencia_nuevo(request):
 
             now = timezone.now()
 
+            # =========================
+            # APERTURA AUTOMÁTICA (REGLA DE NEGOCIO)
+            # =========================
+
             incidencia.fecha_apertura = now
             incidencia.fecha_ultimo = now
 
             incidencia.usuario_apertura = request.user
             incidencia.usuario_actualizacion = request.user
 
+            # =========================
+            # NUEVA INCIDENCIA SIEMPRE ABIERTA
+            # =========================
+            incidencia.cerrado = False
+
             incidencia.save()
 
-            # 🔴 FIX 1: queryset con orden estable (CRÍTICO)
+            # =========================
+            # REDIRECCIÓN AL GRID (POSICIÓN CORRECTA)
+            # =========================
+
             base_qs = Incidencia.objects.all().order_by("id")
 
             qs = _apply_grid_params(base_qs, next_params)
@@ -1136,8 +1315,8 @@ def incidencia_nuevo(request):
                 pos = ids.index(incidencia.id) + 1
                 page_size = 10
                 page = ((pos - 1) // page_size) + 1
+
             except ValueError:
-                # 🔴 FIX 2: fallback correcto
                 page = 1
 
             final_params = dict(next_params)
@@ -1152,16 +1331,11 @@ def incidencia_nuevo(request):
 
     else:
 
-        initial = {
+        # =========================
+        # NUEVO (UI LIMPIO)
+        # =========================
 
-            "fecha_apertura": timezone.now(),
-            "fecha_ultimo": timezone.now(),
-
-            "usuario_apertura": request.user,
-            "usuario_actualizacion": request.user,
-        }
-
-        form = IncidenciaForm(initial=initial)
+        form = IncidenciaForm()
 
     return render(request, "core/incidencia_form.html", {
 
@@ -1169,6 +1343,7 @@ def incidencia_nuevo(request):
         "modo": "nuevo",
         "next": next_url,
     })
+
 
 def incidencia_eliminar(request, id):
 
@@ -1202,8 +1377,46 @@ def incidencia_eliminar(request, id):
     })
 
 
+def incidencia_cerrar(request, id):
 
+    obj = safe_get_object(
+        Incidencia,
+        id,
+        request,
+        "incidencias"
+    )
 
+    if not isinstance(obj, Incidencia):
+        return obj
+
+    next_url = request.POST.get("next") or request.GET.get("next", "")
+    next_params = _query_params_from_string(next_url or "")
+
+    # =========================
+    # PROCESO DE CIERRE
+    # =========================
+
+    if not obj.cerrado:
+
+        obj.cerrado = True
+        obj.fecha_cierre = timezone.now()
+        obj.usuario_cierre = request.user
+
+        obj.save()
+
+    # =========================
+    # RETURN AL GRID (CONSISTENTE)
+    # =========================
+
+    next_params["selected"] = str(obj.id)
+
+    base_url = reverse("incidencias")
+    query = urlencode(next_params)
+
+    return redirect(
+        f"{base_url}?{query}"
+        if query else base_url
+    )
 
 
 

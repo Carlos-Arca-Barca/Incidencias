@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1 class="page-title">
+        {% if modo == "nuevo" %}Nuevo{% endif %}
+        {% if modo == "editar" %}Editar{% endif %}
+        {% if modo == "ver" %}Ver{% endif %}
+        Acción
+    </h1>
+</div>
+
+<form method="post"
+      class="form-card"
+      id="accion-form">
+
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+
+    <div class="form-col">
+
+        <!-- =========================
+             GENERAL
+        ========================== -->
+        <div class="form-section">
+
+            <h3>General</h3>
+
+            <div class="form-row">
+                <label for="{{ form.codigo.id_for_label }}">
+                    {{ form.codigo.label }}
+                </label>
+
+                <div class="form-field">
+                    {{ form.codigo }}
+                    {% if form.codigo.errors %}
+                        <div class="form-error">{{ form.codigo.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label for="{{ form.descripcion.id_for_label }}">
+                    {{ form.descripcion.label }}
+                </label>
+
+                <div class="form-field">
+                    {{ form.descripcion }}
+                    {% if form.descripcion.errors %}
+                        <div class="form-error">{{ form.descripcion.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-row-checkbox">
+                {{ form.es_sistema }}
+                <label for="{{ form.es_sistema.id_for_label }}">
+                    <strong>{{ form.es_sistema.label }}</strong>
+                </label>
+
+                {% if form.es_sistema.errors %}
+                    <div class="form-error">{{ form.es_sistema.errors }}</div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- =========================
+             DETALLE AUTOMÁTICO
+        ========================== -->
+        <fieldset class="form-group" id="detalle-group">
+
+            <legend>
+                {{ form.genera_detalle }}
+                <strong>Generar detalle</strong>
+            </legend>
+
+            <div id="detalle-content">
+
+                <div class="form-row">
+                    <label for="{{ form.detalle_tipo.id_for_label }}">
+                        {{ form.detalle_tipo.label }}
+                    </label>
+
+                    <div class="form-field">
+                        {{ form.detalle_tipo }}
+                        {% if form.detalle_tipo.errors %}
+                            <div class="form-error">{{ form.detalle_tipo.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="{{ form.detalle_descripcion.id_for_label }}">
+                        {{ form.detalle_descripcion.label }}
+                    </label>
+
+                    <div class="form-field">
+                        {{ form.detalle_descripcion }}
+                        {% if form.detalle_descripcion.errors %}
+                            <div class="form-error">{{ form.detalle_descripcion.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="{{ form.detalle_notas.id_for_label }}">
+                        {{ form.detalle_notas.label }}
+                    </label>
+
+                    <div class="form-field">
+                        {{ form.detalle_notas }}
+                        {% if form.detalle_notas.errors %}
+                            <div class="form-error">{{ form.detalle_notas.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+
+        </fieldset>
+
+        <!-- =========================
+             EMAIL
+        ========================== -->
+        <fieldset class="form-group" id="email-group">
+
+            <legend>
+                {{ form.enviar_email }}
+                <strong>Enviar email</strong>
+            </legend>
+
+            <div id="email-content">
+
+                <div class="form-row">
+                    <label for="{{ form.email_to.id_for_label }}">
+                        {{ form.email_to.label }}
+                    </label>
+
+                    <div class="form-field">
+                        {{ form.email_to }}
+                        {% if form.email_to.errors %}
+                            <div class="form-error">{{ form.email_to.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="{{ form.email_cc.id_for_label }}">
+                        {{ form.email_cc.label }}
+                    </label>
+
+                    <div class="form-field">
+                        {{ form.email_cc }}
+                        {% if form.email_cc.errors %}
+                            <div class="form-error">{{ form.email_cc.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="{{ form.email_bcc.id_for_label }}">
+                        {{ form.email_bcc.label }}
+                    </label>
+
+                    <div class="form-field">
+                        {{ form.email_bcc }}
+                        {% if form.email_bcc.errors %}
+                            <div class="form-error">{{ form.email_bcc.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="{{ form.email_subject.id_for_label }}">
+                        {{ form.email_subject.label }}
+                    </label>
+
+                    <div class="form-field">
+                        {{ form.email_subject }}
+                        {% if form.email_subject.errors %}
+                            <div class="form-error">{{ form.email_subject.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="{{ form.email_body.id_for_label }}">
+                        {{ form.email_body.label }}
+                    </label>
+
+                    <div class="form-field">
+                        {{ form.email_body }}
+                        {% if form.email_body.errors %}
+                            <div class="form-error">{{ form.email_body.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row-checkbox">
+                    {{ form.email_attachments }}
+                    <label for="{{ form.email_attachments.id_for_label }}">
+                        {{ form.email_attachments.label }}
+                    </label>
+                </div>
+
+                <div class="form-row-checkbox">
+                    {{ form.email_editable }}
+                    <label for="{{ form.email_editable.id_for_label }}">
+                        {{ form.email_editable.label }}
+                    </label>
+                </div>
+
+            </div>
+
+        </fieldset>
+
+    </div>
+
+    <div class="form-actions" style="display:flex; justify-content:flex-end; gap:10px;">
+
+        {% if modo != "ver" %}
+        <button type="submit" class="btn-primary">
+            Guardar
+        </button>
+        {% endif %}
+
+        <button type="button"
+                class="btn-secondary"
+                onclick="window.location.href='{% url 'acciones' %}{% if next %}?{{ next }}{% endif %}'">
+            Cancelar
+        </button>
+
+    </div>
+
+</form>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const chkDetalle = document.getElementById("id_genera_detalle");
+    const detalleContent = document.getElementById("detalle-content");
+
+    const chkEmail = document.getElementById("id_enviar_email");
+    const emailContent = document.getElementById("email-content");
+
+    function clearInputs(container) {
+        if (!container) return;
+
+        container.querySelectorAll("input, textarea, select").forEach(el => {
+
+            if (el.type === "checkbox" || el.type === "radio") {
+                el.checked = false;
+            } else {
+                el.value = "";
+            }
+
+        });
+    }
+
+    function refreshVisibility() {
+
+        // ===== DETALLE =====
+        if (chkDetalle && detalleContent) {
+
+            if (chkDetalle.checked) {
+                detalleContent.style.display = "";
+            } else {
+                detalleContent.style.display = "none";
+                clearInputs(detalleContent);
+            }
+        }
+
+        // ===== EMAIL =====
+        if (chkEmail && emailContent) {
+
+            if (chkEmail.checked) {
+                emailContent.style.display = "";
+            } else {
+                emailContent.style.display = "none";
+                clearInputs(emailContent);
+            }
+        }
+    }
+
+    if (chkDetalle) {
+        chkDetalle.addEventListener("change", refreshVisibility);
+    }
+
+    if (chkEmail) {
+        chkEmail.addEventListener("change", refreshVisibility);
+    }
+
+    refreshVisibility();
+
+});
+
+</script>
+
+{% endblock %}

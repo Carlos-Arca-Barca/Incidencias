@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1 class="page-title">Acciones</h1>
+</div>
+
+<form class="filtros" onsubmit="return false;">
+
+    <div style="display:flex; gap:10px; align-items:flex-start;">
+
+        <!-- =========================
+             GENERAL
+        ========================== -->
+        <div style="width:320px; flex-shrink:0; overflow:hidden;">
+
+            <div style="font-weight:bold; margin-bottom:10px;">
+                General
+            </div>
+
+            {% for filtro in grid_filters.general %}
+
+                <div class="filtro">
+                    <label style="display:block; min-width:160px;">
+                        {{ filtro.label }}
+                    </label>
+
+                    <input
+                        type="text"
+                        name="{{ filtro.field }}"
+                        value="{{ filtro.value|default:'' }}"
+                        onkeyup="autoFilter()"
+                        style="width:100%; box-sizing:border-box;"
+                    >
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- =========================
+             BOOLEANOS
+        ========================== -->
+        <div style="width:320px; flex-shrink:0; overflow:hidden;">
+
+            <div style="font-weight:bold; margin-bottom:10px;">
+                Estado
+            </div>
+
+            {% for filtro in grid_filters.booleanos %}
+
+                <div class="filtro">
+
+                    <label style="display:block; min-width:160px;">
+                        {{ filtro.label }}
+                    </label>
+
+                    <select
+                        name="{{ filtro.field }}"
+                        onchange="autoFilter()"
+                        style="width:100%; box-sizing:border-box;"
+                    >
+
+                        <option value="" {% if not filtro.value %}selected{% endif %}>
+                            Ambos
+                        </option>
+
+                        <option value="si" {% if filtro.value == "si" %}selected{% endif %}>
+                            Sí
+                        </option>
+
+                        <option value="no" {% if filtro.value == "no" %}selected{% endif %}>
+                            No
+                        </option>
+
+                    </select>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+        
+
+    </div>
+
+</form>
+
+<!-- GRID -->
+<div class="grid-actions">
+    <button type="button" class="actualizar" onclick="refreshGrid()">Filtrar</button>
+    <button type="button" class="limpiar" onclick="limpiar()">Limpiar</button>
+</div>
+
+<hr>
+
+<div id="grid-container">
+    {% include "components/grid.html" %}
+</div>
+
+<script>
+const GRID_URLS = {
+    ver: "{{ grid_urls.ver }}",
+    editar: "{{ grid_urls.editar }}",
+    eliminar: "{{ grid_urls.eliminar }}",
+    nuevo: "{{ grid_urls.nuevo }}"
+};
+</script>
+
+<script src="{% static 'js/grid.js' %}"></script>
+
+<script>
+initGrid({
+    urls: GRID_URLS,
+    buttons: [
+        { id: "btn_ver", requiresSelection: true },
+        { id: "btn_editar", requiresSelection: true },
+        { id: "btn_eliminar", requiresSelection: true },
+        { id: "btn_nuevo", requiresSelection: false }
+    ]
+});
+</script>
+
+{% endblock %}

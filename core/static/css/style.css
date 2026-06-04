@@ -302,9 +302,85 @@ header h1 {
 
 .grid-actions-bottom {
     margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+
     display: flex;
     gap: 10px;
     align-items: center;
+}
+
+/* =========================
+   BOTONES GRID
+========================= */
+
+.grid-actions-bottom button {
+    min-width: 90px;
+    height: 32px;
+
+    border: 1px solid #003366;
+    border-radius: 4px;
+
+    background: white;
+    color: #003366;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.grid-actions-bottom button:hover:not(:disabled) {
+    background: #003366;
+    color: white;
+}
+
+.grid-actions-bottom button:disabled {
+    background: #f4f4f4;
+    border-color: #d0d0d0;
+    color: #999;
+}
+
+/* =========================
+   BOTONES GRID
+========================= */
+
+.grid-actions-bottom button,
+.grid-actions button {
+    min-width: 90px;
+    height: 32px;
+
+    border: 1px solid #003366;
+    border-radius: 4px;
+
+    background: white;
+    color: #003366;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.grid-actions-bottom button:hover:not(:disabled) {
+    background: #003366;
+    color: white;
+}
+
+.grid-actions-bottom button:disabled {
+    background: #f4f4f4;
+    border-color: #c0c0c0;
+    color: #666;
 }
 
 .grid-actions {
@@ -325,6 +401,85 @@ header h1 {
     background-color: #d6e6ff;
 }
 
+.grid-footer-left button.actualizar {
+    min-width: 90px;
+    height: 32px;
+
+    border: 1px solid #1f7a1f;
+    border-radius: 4px;
+
+    background: white;
+    color: #1f7a1f;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+}
+
+.grid-footer-left button.actualizar:hover:not(:disabled) {
+    background: #1f7a1f;
+    color: white;
+}
+
+/* icono */
+.grid-footer-left button.actualizar::before {
+    content: "↻";
+    font-size: 14px;
+}
+
+
+/* =========================
+   BOTÓN ACTUALIZAR GRID
+========================= */
+
+.btn-actualizar {
+    min-width: 90px;
+    height: 32px;
+
+    border: 1px solid #003366;
+    border-radius: 4px;
+
+    background: white;
+    color: #003366;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* icono verde SOLO */
+.btn-actualizar::before {
+    content: "🔄";
+    color: #1b8f3a; /* verde */
+}
+
+/* hover coherente con el resto */
+.btn-actualizar:hover:not(:disabled) {
+    background: #003366;
+    color: white;
+}
+
+.btn-actualizar:hover:not(:disabled)::before {
+    filter: brightness(1.5);
+}
+
+
+
+
+
 .btn-danger {
     padding: 6px 12px;
     background: #b02a37;
@@ -339,9 +494,8 @@ header h1 {
 }
 
 button:disabled {
-    opacity: 0.4;
+    opacity: 0.8;
     cursor: not-allowed;
-    filter: grayscale(0.5);
 }
 
 /* =========================
@@ -585,16 +739,88 @@ th.sorted.desc .sort-icon::before {
     margin-top: 20px;
 }
 
+.form-section {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.form-section h3 {
+    margin: 0 0 15px 0;
+    font-size: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 6px;
+}
+
+.form-row-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-row-checkbox input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.form-row-checkbox label {
+    width: auto;
+    padding: 0;
+    margin: 0;
+    font-weight: 600;
+}
+
+.form-group legend {
+    font-weight: 700;
+    padding: 0 8px;
+}
+
+.form-group legend label {
+    font-weight: 700;
+}
+
+.form-group legend input[type="checkbox"] {
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
 .btn-primary {
     background: #003366;
     color: white;
-    border: none;
+    border: 1px solid #003366;
+    border-radius: 4px;
     padding: 6px 12px;
+    min-width: 90px;
+    height: 32px;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
+    transition: all 0.15s ease;
 }
 
-.btn-primary:hover {
-    background: #0055aa;
+.btn-primary:hover:not(:disabled) {
+    background: #004a99;
+    border-color: #004a99;
+}
+
+.btn-secondary {
+    background: white;
+    color: #003366;
+    border: 1px solid #003366;
+    border-radius: 4px;
+    padding: 6px 12px;
+    min-width: 90px;
+    height: 32px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: #003366;
+    color: white;
 }
 
 .btn-link {
@@ -661,4 +887,207 @@ input:disabled {
 input[readonly]:hover,
 textarea[readonly]:hover {
     border-color: #b8b8b8;
+}
+
+
+/* LUPAS */
+.lookup-btn {
+    width: 32px;
+    height: 32px;
+
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #003366;
+    border-radius: 4px;
+
+    background: white;
+    color: #003366;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.lookup-btn:hover:not(:disabled) {
+    background: #003366;
+    color: white;
+}
+
+.lookup-btn:disabled {
+    background: #f4f4f4;
+    border-color: #c0c0c0;
+    color: #666;
+}
+
+
+/* =========================
+   ICONOS BOTONES
+========================= */
+
+
+#btn_ver::before {
+    content: "🔍 ";
+}
+
+#btn_editar::before {
+    content: "✏️ ";
+}
+
+#btn_nuevo::before {
+    content: "➕ ";
+}
+
+#btn_eliminar::before {
+    content: "🗑 ";
+}
+
+
+
+
+/* =========================
+   ICONOS FORMULARIOS (CRUD)
+========================= */
+
+/* Guardar */
+.btn-primary::before {
+    content: "💾 ";
+}
+
+/* Cancelar */
+.btn-secondary::before {
+    content: "↩ ";
+}
+
+/* Cerrar (acción de negocio) */
+.btn-cerrar::before {
+    content: "🔒 ";
+}
+
+
+
+/* =========================
+   ICONOS FILTROS GRID
+========================= */
+
+/* Filtrar */
+.grid-actions button.actualizar::before {
+    content: "🔎 ";
+}
+
+/* Limpiar */
+.grid-actions button.limpiar::before {
+    content: "✖ ";
+}
+
+
+
+/* =========================
+   BOTONES BASE (UNIFICADO)
+========================= */
+
+button {
+    transition: all 0.15s ease;
+    border-radius: 4px;
+}
+
+/* =========================
+   BOTÓN PRIMARIO (AZUL)
+========================= */
+.btn-primary {
+    background: #003366;
+    color: white;
+    border: 1px solid #003366;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #0055aa;
+    border-color: #0055aa;
+}
+
+/* =========================
+   BOTÓN SECUNDARIO (GRIS)
+========================= */
+.btn-secondary {
+    background: #e9e9e9;
+    color: #222;
+    border: 1px solid #c8c8c8;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+/* hover más oscuro y con contraste real */
+.btn-secondary:hover:not(:disabled) {
+    background: #d6d6d6;
+    border-color: #a8a8a8;
+    color: #111;
+}
+
+/* foco (teclado / accesibilidad) */
+.btn-secondary:focus {
+    outline: 2px solid #0055aa;
+    outline-offset: 1px;
+}
+
+/* =========================
+   BOTÓN DANGER (ELIMINAR)
+========================= */
+.btn-danger {
+    background: #b02a37;
+    color: white;
+    border: 1px solid #b02a37;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #8f222c;
+    border-color: #8f222c;
+}
+
+/* =========================
+   DISABLED (IMPORTANTE)
+   - visible pero apagado
+========================= */
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: grayscale(0.2);
+}
+
+/* =========================
+   BOTONES FILTROS / GRID
+========================= */
+
+.filtros button,
+.grid-actions button,
+.grid-actions-bottom button,
+.paginacion button {
+    font-size: 13px;
+    padding: 5px 10px;
+}
+
+
+/* =========================
+   BOTÓN ELIMINAR CRUD
+========================= */
+
+.btn-eliminar::before {
+    content: "🗑 ";
+    margin-right: 4px;
+}
+
+/* opcional: refuerzo visual coherente con peligro */
+.btn-eliminar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }

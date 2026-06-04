@@ -51,14 +51,20 @@
                             {{ field }}
                         </div>
 
-                        {% if modo != "ver" %}
-                        <button type="button"
-                                class="btn-secondary"
-                                data-lookup-url="{% url 'clientes' %}"
-                                data-lookup-target="id_cliente"
-                                onclick="Lookup.open(this)">
-                            🔍
-                        </button>
+                        {% if modo == "ver" %}
+
+                        {% elif modo == "editar" and incidencia.cerrado %}
+
+                        {% else %}
+
+                            <button type="button"
+                                    class="lookup-btn"
+                                    data-lookup-url="{% url 'clientes' %}"
+                                    data-lookup-target="id_cliente"
+                                    onclick="Lookup.open(this)">
+                                🔍
+                            </button>
+
                         {% endif %}
 
                     </div>
@@ -89,14 +95,20 @@
                             {{ field }}
                         </div>
 
-                        {% if modo != "ver" %}
-                        <button type="button"
-                                class="btn-secondary"
-                                data-lookup-url="{% url 'calidad' %}"
-                                data-lookup-target="id_calidad"
-                                onclick="Lookup.open(this)">
-                            🔍
-                        </button>
+                        {% if modo == "ver" %}
+
+                        {% elif modo == "editar" and incidencia.cerrado %}
+
+                        {% else %}
+
+                            <button type="button"
+                                    class="lookup-btn"
+                                    data-lookup-url="{% url 'calidad' %}"
+                                    data-lookup-target="id_calidad"
+                                    onclick="Lookup.open(this)">
+                                🔍
+                            </button>
+
                         {% endif %}
 
                     </div>
@@ -109,14 +121,20 @@
                             {{ field }}
                         </div>
 
-                        {% if modo != "ver" %}
-                        <button type="button"
-                                class="btn-secondary"
-                                data-lookup-url="{% url 'categorias' %}"
-                                data-lookup-target="id_categoria"
-                                onclick="Lookup.open(this)">
-                            🔍
-                        </button>
+                        {% if modo == "ver" %}
+
+                        {% elif modo == "editar" and incidencia.cerrado %}
+
+                        {% else %}
+
+                            <button type="button"
+                                    class="lookup-btn"
+                                    data-lookup-url="{% url 'categorias' %}"
+                                    data-lookup-target="id_categoria"
+                                    onclick="Lookup.open(this)">
+                                🔍
+                            </button>
+
                         {% endif %}
 
                     </div>
@@ -148,17 +166,52 @@
     </div>
 
     <div class="form-actions"
-         style="display:flex; justify-content:flex-end; gap:10px;">
+        style="display:flex; justify-content:flex-end; gap:10px;">
 
-        {% if modo != "ver" %}
-            <button type="submit" class="btn-primary">
-                Guardar
-            </button>
-        {% endif %}
+        {# ========================= #}
+        {# CERRAR #}
+        {# ========================= #}
 
-        <button type="button"
-                class="btn-secondary"
-                onclick="window.location.href='{% url 'incidencias' %}{% if next %}?{{ next }}{% endif %}'">
+        <button
+            type="button"
+            class="btn-primary btn-cerrar"
+            {% if modo == "ver" or modo == "nuevo" or incidencia.cerrado or not incidencia.id %}
+                disabled
+                style="opacity:0.5; cursor:not-allowed;"
+            {% else %}
+                onclick="window.location.href='{% url 'incidencia_cerrar' incidencia.id %}?next={{ next }}'"
+            {% endif %}>
+            Cerrar
+        </button>
+
+
+        {# ========================= #}
+        {# GUARDAR #}
+        {# ========================= #}
+
+        <button
+            type="submit"
+            class="btn-primary"
+
+            {% if modo == "ver" %}
+                disabled
+                style="opacity:0.5; cursor:not-allowed;"
+            {% elif modo == "editar" and incidencia.cerrado %}
+                disabled
+                style="opacity:0.5; cursor:not-allowed;"
+            {% endif %}>
+            Guardar
+        </button>
+
+
+        {# ========================= #}
+        {# CANCELAR #}
+        {# ========================= #}
+
+        <button
+            type="button"
+            class="btn-secondary"
+            onclick="Lookup.cancel(this)">
             Cancelar
         </button>
 
